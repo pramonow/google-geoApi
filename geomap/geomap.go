@@ -8,6 +8,37 @@ import (
 	"net/http"
 )
 
+type GooglePlaceDetailResponse struct {
+	HTMLAttributions []interface{} `json:"html_attributions"`
+	Result           struct {
+		AddressComponents        []AddressComponent  `json:"address_components"`
+		AdrAddress               string              `json:"adr_address"`
+		FormattedAddress         string              `json:"formatted_address"`
+		FormattedPhoneNumber     string              `json:"formatted_phone_number"`
+		Geometry                 GoogleGeometry      `json:"geometry"`
+		Icon                     string              `json:"icon"`
+		ID                       string              `json:"id"`
+		InternationalPhoneNumber string              `json:"international_phone_number"`
+		Name                     string              `json:"name"`
+		OpeningHours             OpeningHour         `json:"opening_hours"`
+		Photos                   []Photo             `json:"photos"`
+		PlaceID                  string              `json:"place_id"`
+		PlusCode                 GooglePlusCode      `json:"plus_code"`
+		PriceLevel               int                 `json:"price_level"`
+		Rating                   float64             `json:"rating"`
+		Reference                string              `json:"reference"`
+		Reviews                  []GooglePlaceReview `json:"reviews"`
+		Scope                    string              `json:"scope"`
+		Types                    []string            `json:"types"`
+		URL                      string              `json:"url"`
+		UserRatingsTotal         int                 `json:"user_ratings_total"`
+		UtcOffset                int                 `json:"utc_offset"`
+		Vicinity                 string              `json:"vicinity"`
+		Website                  string              `json:"website"`
+	} `json:"result"`
+	Status string `json:"status"`
+}
+
 type GoogleGeocodeResponse struct {
 	Results []struct {
 		AddressComponents []AddressComponent `json:"address_components"`
@@ -49,6 +80,24 @@ type GoogleNearbySearchResponse struct {
 
 type OpeningHour struct {
 	OpenNow bool `json:"open_now"`
+	Periods []struct {
+		Open struct {
+			Day  int    `json:"day"`
+			Time string `json:"time"`
+		} `json:"open"`
+	} `json:"periods,omitempty"`
+	WeekdayText []string `json:"weekday_text,omitempty"`
+}
+
+type GooglePlaceReview struct {
+	AuthorName              string `json:"author_name"`
+	AuthorURL               string `json:"author_url"`
+	Language                string `json:"language"`
+	ProfilePhotoURL         string `json:"profile_photo_url"`
+	Rating                  int    `json:"rating"`
+	RelativeTimeDescription string `json:"relative_time_description"`
+	Text                    string `json:"text"`
+	Time                    int    `json:"time"`
 }
 
 type Candidate struct {
@@ -239,4 +288,47 @@ func PlaceNearby(ctx context.Context, params map[string]string) (GoogleNearbySea
 	}
 
 	return googleNearbySearchResponse, nil
+}
+
+func PlaceDetail(ctx context.Context, params map[string]string) (GooglePlaceDetailResponse, error) {
+
+	var googlePlaceDetailResponse GooglePlaceDetailResponse
+
+	//Generating url for geocode
+	reqURL := "https://maps.googleapis.com/maps/api/place/details/json"
+
+	req, err := http.NewRequest("GET", reqURL, nil)
+	if err != nil {
+		return googlePlaceDetailResponse, err
+	}
+
+	//Insert the query mapping into the request
+	q := req.URL.Query()
+	for key, val := range params {
+		q.Add(key, val)
+	}
+	req.URL.RawQuery = q.Encode()
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return googlePlaceDetailResponse, err
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		return googlePlaceDetailResponse, errors.New("Status not OK")
+	}
+
+	defer resp.Body.Close()
+	contents, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return googlePlaceDetailResponse, err
+	}
+
+	//Unmarshal the contents
+	err = json.Unmarshal(contents, &googlePlaceDetailResponse)
+	if err != nil {
+		return googlePlaceDetailResponse, err
+	}
+
+	return googlePlaceDetailResponse, nil
 }
