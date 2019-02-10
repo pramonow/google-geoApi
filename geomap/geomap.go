@@ -8,6 +8,17 @@ import (
 	"net/http"
 )
 
+/*
+	Google Map API package
+	Containing model and API call for:
+	- Google geocoding
+	- Google geolocation detail
+	- Google get nearby
+	- Google search location
+
+	Each of the api call will need the google map API key
+*/
+
 type GooglePlaceDetailResponse struct {
 	HTMLAttributions []interface{} `json:"html_attributions"`
 	Result           struct {
@@ -153,7 +164,6 @@ func init() {
 /*
 	GetReverseGeoCode will return GoogleReverseGeocodeResponse on success
 	the example of usage is sending params that contains "address" and "key" (both of them are required)
-	Key is obtained in config.GoogleMap.Key
 	more references https://developers.google.com/maps/documentation/geocoding/intro#Geocoding
 */
 func GetGeocode(ctx context.Context, params map[string]string) (GoogleGeocodeResponse, error) {
@@ -199,6 +209,10 @@ func GetGeocode(ctx context.Context, params map[string]string) (GoogleGeocodeRes
 	return googleGeocodeResponse, nil
 }
 
+/*
+	FindPlace will return GooglePlaceSearchResponse on success
+	more references https://developers.google.com/places/web-service/search
+*/
 func FindPlace(ctx context.Context, params map[string]string) (GooglePlaceSearchResponse, error) {
 
 	var googleFindPlaceResponse GooglePlaceSearchResponse
@@ -243,9 +257,8 @@ func FindPlace(ctx context.Context, params map[string]string) (GooglePlaceSearch
 }
 
 /*
-	By default, when a user selects a place, Nearby Search returns all of the available data fields for the selected place,
-	and you will be billed accordingly. There is no way to constrain Nearby Search requests to only return specific fields.
-	To keep from requesting (and paying for) data that you don't need, use a Find Place request instead.
+	FindPlace will return GoogleNearbySearchResponse on success
+	more references https://developers.google.com/places/web-service/search
 */
 func PlaceNearby(ctx context.Context, params map[string]string) (GoogleNearbySearchResponse, error) {
 
@@ -290,6 +303,10 @@ func PlaceNearby(ctx context.Context, params map[string]string) (GoogleNearbySea
 	return googleNearbySearchResponse, nil
 }
 
+/*
+	FindPlace will return GooglePlaceDetailResponse on success
+	more references https://developers.google.com/places/web-service/details
+*/
 func PlaceDetail(ctx context.Context, params map[string]string) (GooglePlaceDetailResponse, error) {
 
 	var googlePlaceDetailResponse GooglePlaceDetailResponse

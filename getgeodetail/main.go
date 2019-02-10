@@ -21,7 +21,9 @@ func Handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 
 	ctx := context.Background()
 
+	//required query
 	placeid := request.QueryStringParameters["placeid"]
+
 	//Replace with api key
 	key := "API KEY HERE"
 
@@ -30,6 +32,7 @@ func Handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 		"key":     key,
 	}
 
+	//obtains place detail response to be processed
 	googleResp, err := geomap.PlaceDetail(ctx, geoParams)
 	if err != nil {
 		return events.APIGatewayProxyResponse{Body: "Error", StatusCode: 400}, err

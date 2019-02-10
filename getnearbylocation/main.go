@@ -21,6 +21,7 @@ func Handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 
 	ctx := context.Background()
 
+	//required query
 	location := request.QueryStringParameters["location"]
 	radius := request.QueryStringParameters["radius"]
 	name := request.QueryStringParameters["name"]
@@ -34,10 +35,12 @@ func Handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 		"key":      key,
 	}
 
+	//optional query param
 	if name != "" {
 		geoParams["name"] = name
 	}
 
+	//obtains place nearby response to be processed
 	googleResp, err := geomap.PlaceNearby(ctx, geoParams)
 	if err != nil {
 		return events.APIGatewayProxyResponse{Body: "Error", StatusCode: 400}, err
