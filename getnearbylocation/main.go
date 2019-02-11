@@ -27,7 +27,7 @@ func Handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 	name := request.QueryStringParameters["name"]
 
 	//Replace with api key
-	key := "API KEY HERE"
+	key := request.StageVariables["GOOGLE_API_KEY"]
 
 	geoParams := map[string]string{
 		"location": location,
