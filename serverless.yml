@@ -22,7 +22,7 @@ provider:
   name: aws
   runtime: go1.x
   environment:
-    GOOGLE_API_KEY: AIzaSyBOirP8dh4ONQSrAHNYh1-oSiy4hju8KAA
+    GOOGLE_API_KEY: KEY #CHANGE YOUR API KEY
 
 # you can overwrite defaults here
 #  stage: dev
